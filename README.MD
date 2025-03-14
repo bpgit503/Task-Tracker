@@ -1,0 +1,1 @@
+The Task Tracker App is designed to help users organize their daily tasks, set priorities, and track their progress. 
