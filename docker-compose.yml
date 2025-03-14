@@ -1,0 +1,15 @@
+
+services:
+  db:
+    image: mysql:8
+    container_name: mysql-TTContainer
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPasword  # Root user password
+      MYSQL_DATABASE: TaskTrackerDB  # Default database to create
+      MYSQL_USER: myuser  # Non-root user
+      MYSQL_PASSWORD: mypassword  # Password for non-root user
+
+    ports:
+      - "3307:3306"
