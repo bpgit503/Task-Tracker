@@ -3,10 +3,12 @@ package com.devbp.tasks.domain.mappers.impl;
 import com.devbp.tasks.domain.dto.TaskDto;
 import com.devbp.tasks.domain.entities.Task;
 import com.devbp.tasks.domain.mappers.TaskMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TaskMapperImpl implements TaskMapper {
     @Override
-    public TaskDto mapTo(Task task) {
+    public TaskDto fromDto(Task task) {
         return new TaskDto(
                 task.getId(),
                 task.getTitle(),
@@ -18,8 +20,8 @@ public class TaskMapperImpl implements TaskMapper {
     }
 
     @Override
-    public Task mapFrom(TaskDto taskDto) {
-        return new  Task(
+    public Task toDto(TaskDto taskDto) {
+        return new Task(
                 taskDto.id(),
                 taskDto.title(),
                 taskDto.description(),
