@@ -28,11 +28,11 @@ public class Task {
     @Column(name = "due_date", nullable = false)
     private LocalDateTime dueDate;
 
-    @Column(name = "status", nullable = false)
-    private TaskStatus status;
-
     @Column(name = "priority", nullable = false)
     private TaskPriority priority;
+
+    @Column(name = "status", nullable = false)
+    private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_list_id")
