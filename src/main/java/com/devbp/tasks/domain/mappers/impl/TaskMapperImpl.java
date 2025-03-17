@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskMapperImpl implements TaskMapper {
     @Override
-    public TaskDto fromDto(Task task) {
+    public TaskDto toDto(Task task) {
         return new TaskDto(
                 task.getId(),
                 task.getTitle(),
@@ -20,7 +20,7 @@ public class TaskMapperImpl implements TaskMapper {
     }
 
     @Override
-    public Task toDto(TaskDto taskDto) {
+    public Task fromDto(TaskDto taskDto) {
         return new Task(
                 taskDto.id(),
                 taskDto.title(),

@@ -7,7 +7,6 @@ import com.devbp.tasks.domain.entities.TaskStatus;
 import com.devbp.tasks.domain.mappers.TaskListMapper;
 import com.devbp.tasks.domain.mappers.TaskMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class TaskListMapperImpl implements TaskListMapper {
                 calculateTaskListProgress(taskList.getTasks()),
                 Optional.ofNullable(taskList.getTasks())
                         .map(tasks ->
-                                tasks.stream().map(taskMapper::fromDto).toList()
+                                tasks.stream().map(taskMapper::toDto).toList()
                         ).orElse(null)
         );
 
@@ -51,7 +50,18 @@ public class TaskListMapperImpl implements TaskListMapper {
     }
 
     @Override
-    public TaskList fromDto(TaskList taskList) {
-        return null;
+    public TaskList fromDto(TaskListDto taskListDto) {
+        return new TaskList(
+             taskListDto.id(),
+                taskListDto.title(),
+                taskListDto.description(),
+                Optional.ofNullable(taskListDto.tasks())
+                        .map(tasks -> tasks.stream()
+                                .map(taskMapper::fromDto).toList())
+                        .orElse(null),
+                null,
+                null
+        );
+
     }
 }
