@@ -2,6 +2,7 @@ package com.devbp.tasks.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "tasklist")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskList {
