@@ -1,4 +1,4 @@
-package com.devbp.tasks.domain.mappers;
+package com.devbp.tasks.mappers;
 
 import com.devbp.tasks.domain.dto.TaskDto;
 import com.devbp.tasks.domain.entities.Task;

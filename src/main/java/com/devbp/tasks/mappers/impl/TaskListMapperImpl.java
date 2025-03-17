@@ -1,11 +1,11 @@
-package com.devbp.tasks.domain.mappers.impl;
+package com.devbp.tasks.mappers.impl;
 
 import com.devbp.tasks.domain.dto.TaskListDto;
 import com.devbp.tasks.domain.entities.Task;
 import com.devbp.tasks.domain.entities.TaskList;
 import com.devbp.tasks.domain.entities.TaskStatus;
-import com.devbp.tasks.domain.mappers.TaskListMapper;
-import com.devbp.tasks.domain.mappers.TaskMapper;
+import com.devbp.tasks.mappers.TaskListMapper;
+import com.devbp.tasks.mappers.TaskMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
