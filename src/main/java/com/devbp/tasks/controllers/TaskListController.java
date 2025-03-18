@@ -4,13 +4,10 @@ import com.devbp.tasks.domain.dto.TaskListDto;
 import com.devbp.tasks.mappers.TaskListMapper;
 import com.devbp.tasks.services.TaskListService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,16 +19,16 @@ public class TaskListController {
 
 
     private final TaskListService taskListService;
+
     private final TaskListMapper taskListMapper;
 
     @GetMapping(TASK_LIST_PATH)
-    public ResponseEntity<List<TaskListDto>> listTaskList(){
+    public List<TaskListDto> listTaskList() {
 
-        List<TaskListDto> list =  taskListService.listTaskList().stream()
+        return taskListService.listTaskList().stream()
                 .map(taskListMapper::toDto)
                 .toList();
 
-        return new ResponseEntity<>(list, HttpStatus.OK);
 
     }
 

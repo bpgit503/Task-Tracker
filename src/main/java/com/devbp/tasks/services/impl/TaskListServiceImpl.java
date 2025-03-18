@@ -4,7 +4,9 @@ import com.devbp.tasks.domain.entities.TaskList;
 import com.devbp.tasks.repositories.TaskListRepository;
 import com.devbp.tasks.services.TaskListService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,7 +18,13 @@ public class TaskListServiceImpl implements TaskListService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<TaskList> listTaskList() {
-        return taskListRepository.findAll();
+
+        List<TaskList> tasklist = taskListRepository.findAll();
+
+        tasklist.forEach(taskList -> Hibernate.initialize(taskList.getTasks()));
+
+        return tasklist;
     }
 }
