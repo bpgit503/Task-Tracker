@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,5 +27,25 @@ public class TaskListServiceImpl implements TaskListService {
         tasklist.forEach(taskList -> Hibernate.initialize(taskList.getTasks()));
 
         return tasklist;
+    }
+
+    @Override
+    public TaskList createTaskList(TaskList taskList) {
+        if(null != taskList.getId()) {
+            throw new IllegalArgumentException("Task list already has an ID!");
+        }
+        if(null == taskList.getTitle() || taskList.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("Task list title must not be empty!");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        return taskListRepository.save(new TaskList(
+                null,
+                taskList.getTitle(),
+                taskList.getDescription(),
+                null,
+                now,
+                now
+        ));
     }
 }

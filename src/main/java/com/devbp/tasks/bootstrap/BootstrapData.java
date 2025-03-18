@@ -47,8 +47,6 @@ public class BootstrapData  implements CommandLineRunner {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
-            taskListRepository.save(taskList1);
-            taskListRepository.save(taskList2);
 
 
             Task task1 = Task.builder()
@@ -81,13 +79,21 @@ public class BootstrapData  implements CommandLineRunner {
                     .updatedAt(LocalDateTime.now())
                     .build();
 
+            taskList1.setTasks(List.of(task1,task2));
+            taskList2.setTasks(List.of(task3));
+
+            taskListRepository.save(taskList1);
+            taskListRepository.save(taskList2);
+
+            task1.setTaskList(taskList1);
+            task2.setTaskList(taskList1);
+            task3.setTaskList(taskList2);
+
             taskRepository.save(task1);
             taskRepository.save(task2);
             taskRepository.save(task3);
 
 
-        taskList1.setTasks(List.of(task1,task2));
-        taskList2.setTasks(List.of(task3));
 
     }
 
