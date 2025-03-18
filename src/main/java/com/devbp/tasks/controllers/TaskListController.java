@@ -4,12 +4,11 @@ import com.devbp.tasks.domain.dto.TaskListDto;
 import com.devbp.tasks.mappers.TaskListMapper;
 import com.devbp.tasks.services.TaskListService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +35,12 @@ public class TaskListController {
     @PostMapping(TASK_LIST_PATH)
     public TaskListDto createTaskList(@RequestBody TaskListDto taskListDto) {
         return taskListMapper.toDto(taskListService.createTaskList(taskListMapper.fromDto(taskListDto)));
+    }
+
+    @GetMapping(TASK_LIST_PATH_ID)
+    public Optional<TaskListDto> getTaskList(@PathVariable UUID id) {
+
+        return taskListService.getTaskList(id).map(taskListMapper::toDto);
     }
 
 
