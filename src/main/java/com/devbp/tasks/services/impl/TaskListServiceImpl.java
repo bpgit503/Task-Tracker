@@ -58,6 +58,7 @@ public class TaskListServiceImpl implements TaskListService {
         return taskListRepository.findById(taskListId);
     }
 
+    @Transactional
     @Override
     public TaskList updateTaskList(UUID taskListId, TaskList taskList) {
 

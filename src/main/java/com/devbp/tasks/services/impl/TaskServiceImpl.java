@@ -10,6 +10,7 @@ import com.devbp.tasks.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +32,7 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByTaskListId(taskListId);
     }
 
+    @Transactional
     @Override
     public Task createTask(UUID taskListId, Task task) {
         if (null != task.getId()) {
@@ -70,23 +72,23 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByTaskListIdAndId(taskListId, taskId);
     }
 
+    @Transactional
     @Override
     public Task updateTask(UUID taskListId, UUID taskId, Task task) {
 
-        if( null == task.getId()) {
+        if (null == task.getId()) {
             throw new IllegalArgumentException("Task must have an ID");
         }
 
-        if(!Objects.equals(taskId,  task.getId())) {
-            log.info("Task url uuid : "+taskId +"\ntask body uuid:" + task.getId());
+        if (!Objects.equals(taskId, task.getId())) {
             throw new IllegalArgumentException("Task IDs do not match!");
         }
 
-        if( null == task.getPriority()) {
+        if (null == task.getPriority()) {
             throw new IllegalArgumentException("Task must have a valid priority");
         }
 
-        if(null == task.getStatus()){
+        if (null == task.getStatus()) {
             throw new IllegalArgumentException("Task must have a valid status");
         }
 
@@ -102,5 +104,11 @@ public class TaskServiceImpl implements TaskService {
         exsitingTask.setUpdatedAt(LocalDateTime.now());
 
         return taskRepository.save(exsitingTask);
+    }
+
+    @Transactional
+    @Override
+    public void deleteTask(UUID taskListId, UUID taskId) {
+        taskRepository.deleteByTaskListIdAndId(taskListId, taskId);
     }
 }
