@@ -5,9 +5,11 @@ import com.devbp.tasks.mappers.TaskMapper;
 import com.devbp.tasks.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,8 +24,8 @@ public class TaskController {
 
     private final TaskMapper taskMapper;
 
-    @GetMapping(TASK_PATH)
-    public List<TaskDto> listTasks(){
-        return taskService.listTask().stream().map(taskMapper::toDto).collect(Collectors.toList());
+    @GetMapping(TASK_PATH_ID)
+    public List<TaskDto> listTasks(@PathVariable UUID id) {
+        return taskService.listTask(id).stream().map(taskMapper::toDto).toList();
     }
 }
