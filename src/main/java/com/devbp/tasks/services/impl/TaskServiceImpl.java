@@ -8,13 +8,16 @@ import com.devbp.tasks.repositories.TaskListRepository;
 import com.devbp.tasks.repositories.TaskRepository;
 import com.devbp.tasks.services.TaskService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -65,5 +68,39 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Optional<Task> getTask(UUID taskListId, UUID taskId) {
         return taskRepository.findByTaskListIdAndId(taskListId, taskId);
+    }
+
+    @Override
+    public Task updateTask(UUID taskListId, UUID taskId, Task task) {
+
+        if( null == task.getId()) {
+            throw new IllegalArgumentException("Task must have an ID");
+        }
+
+        if(!Objects.equals(taskId,  task.getId())) {
+            log.info("Task url uuid : "+taskId +"\ntask body uuid:" + task.getId());
+            throw new IllegalArgumentException("Task IDs do not match!");
+        }
+
+        if( null == task.getPriority()) {
+            throw new IllegalArgumentException("Task must have a valid priority");
+        }
+
+        if(null == task.getStatus()){
+            throw new IllegalArgumentException("Task must have a valid status");
+        }
+
+        Task exsitingTask = taskRepository.findByTaskListIdAndId(taskListId, taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+
+        exsitingTask.setTitle(task.getTitle());
+        exsitingTask.setDescription(task.getDescription());
+        exsitingTask.setDueDate(task.getDueDate());
+        exsitingTask.setPriority(task.getPriority());
+        exsitingTask.setStatus(task.getStatus());
+        exsitingTask.setUpdatedAt(LocalDateTime.now());
+
+        return taskRepository.save(exsitingTask);
     }
 }

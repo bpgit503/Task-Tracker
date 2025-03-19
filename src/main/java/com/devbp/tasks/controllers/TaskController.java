@@ -18,6 +18,7 @@ public class TaskController {
     public static final String TASK_PATH = "/tasks";
 
     public static final String TASK_PATH_ID = "/tasks/{taskListId}";
+    public static final String TASK_PATH_TASK_LIST_ID_TASK_ID = "/tasks/{taskListId}/{taskId}";
 
     private final TaskService taskService;
 
@@ -34,9 +35,15 @@ public class TaskController {
 
     }
 
-    @GetMapping(TASK_PATH_ID+"/{taskId}")
+    @GetMapping(TASK_PATH_TASK_LIST_ID_TASK_ID)
     public Optional<TaskDto> getTask(@PathVariable UUID taskListId, @PathVariable UUID taskId) {
         return taskService.getTask(taskListId, taskId).map(taskMapper::toDto);
+
+    }
+
+    @PutMapping(TASK_PATH_TASK_LIST_ID_TASK_ID)
+    public TaskDto updateTask(@PathVariable UUID taskListId, @PathVariable UUID taskId, @RequestBody TaskDto taskDto) {
+        return taskMapper.toDto(taskService.updateTask(taskListId, taskId,taskMapper.fromDto(taskDto)));
 
     }
 }
