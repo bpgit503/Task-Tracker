@@ -4,7 +4,6 @@ import com.devbp.tasks.domain.dto.TaskListDto;
 import com.devbp.tasks.domain.entities.TaskList;
 import com.devbp.tasks.repositories.TaskListRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +14,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.devbp.tasks.controllers.TaskListController.TASK_LIST_PATH;
-import static com.devbp.tasks.controllers.TaskListController.TASK_LIST_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -66,6 +65,17 @@ class TaskListControllerIT {
         assertThat(savedTaskList).isPresent();
         assertThat(savedTaskList.get().getTitle()).isEqualTo(taskListDto.title());
 
+
+    }
+
+
+    @Test
+    void testListTaskList() throws Exception {
+        taskListRepository.deleteAll();
+
+        List<TaskList> taskLists = taskListRepository.findAll();
+
+        assertThat(taskLists).isEmpty();
 
     }
 }
