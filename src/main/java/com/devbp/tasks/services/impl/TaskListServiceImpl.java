@@ -6,6 +6,7 @@ import com.devbp.tasks.repositories.TaskRepository;
 import com.devbp.tasks.services.TaskListService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskListServiceImpl implements TaskListService {
@@ -23,14 +25,8 @@ public class TaskListServiceImpl implements TaskListService {
 
 
     @Override
-    @Transactional(readOnly = true)
     public List<TaskList> listTaskList() {
-
-        List<TaskList> tasklist = taskListRepository.findAll();
-
-        tasklist.forEach(taskList -> Hibernate.initialize(taskList.getTasks()));
-
-        return tasklist;
+        return taskListRepository.findAll();
     }
 
     @Override
@@ -71,6 +67,10 @@ public class TaskListServiceImpl implements TaskListService {
             throw new IllegalArgumentException("Task list id must have an ID!");
         }
 
+        if(!taskList.getId().equals(taskListId)) {
+            throw new IllegalArgumentException("Task list id does not match!");
+        }
+
         return taskListRepository.findById(taskListId)
                 .map(foundTaskList -> {
                     foundTaskList.setTitle(taskList.getTitle());
@@ -79,7 +79,7 @@ public class TaskListServiceImpl implements TaskListService {
 
                     return taskListRepository.save(foundTaskList);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("Task list with ID " + taskListId + " not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("Task list with ID " + taskListId + " not found!"));
     }
 
     @Override
@@ -88,6 +88,11 @@ public class TaskListServiceImpl implements TaskListService {
             throw new IllegalArgumentException("Task list id must have an ID!");
         }
 
+        if(!taskListRepository.existsById(taskListId)) {
+            throw new IllegalArgumentException((taskListId + " does not exist!"));
+        }
+
         taskListRepository.deleteById(taskListId);
+        log.info("This shouldn't run during errors");
     }
 }

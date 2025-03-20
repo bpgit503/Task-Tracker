@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,9 +22,7 @@ import static com.devbp.tasks.controllers.TaskListController.TASK_LIST_PATH;
 import static com.devbp.tasks.controllers.TaskListController.TASK_LIST_PATH_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -114,10 +111,90 @@ class TaskListControllerIT {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> {
+
                     String responseBody = result.getResponse().getContentAsString();
-                    log.info(responseBody);
                     assertThat(responseBody).contains("Task list does not exist!");
                 });
+    }
+
+    @Test
+    void testUpdateTaskList() throws Exception {
+        UUID taskListId = taskListRepository.findAll().get(0).getId();
+        TaskListDto taskListDto = new TaskListDto(
+                taskListId,
+                "Test Title",
+                "Test description",
+                0,
+                0.0,
+                null
+        );
+
+        mockMvc.perform(put(TASK_LIST_PATH_ID, taskListId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(taskListDto)))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertThat(responseBody).contains(taskListId.toString());
+                    assertThat(responseBody).contains(taskListDto.title());
+                    assertThat(responseBody).contains(taskListDto.description());
+                });
+
+        Optional<TaskList> updatedTaskList = taskListRepository.findById(taskListId);
+
+        assertThat(updatedTaskList.get().getTitle()).isEqualTo(taskListDto.title());
+        assertThat(updatedTaskList.get().getDescription()).isEqualTo(taskListDto.description());
+
+    }
+
+    @Test
+    void testUpdateNotFound() throws Exception {
+        UUID taskListId = taskListRepository.findAll().get(0).getId();
+        UUID differentTaskListId = UUID.randomUUID();
+        TaskListDto taskListDto = new TaskListDto(
+                differentTaskListId,
+                "Test Title",
+                "Test description",
+                0,
+                0.0,
+                null
+        );
+
+
+        mockMvc.perform(put(TASK_LIST_PATH_ID, differentTaskListId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(taskListDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertThat(responseBody).contains("Task list with ID " + differentTaskListId + " not found!");
+                });
+    }
+
+    @Test
+    void testDeleteTest() throws Exception {
+        UUID taskListId = taskListRepository.findAll().get(1).getId();
+
+        mockMvc.perform(delete(TASK_LIST_PATH_ID, taskListId)
+                .accept(MediaType.APPLICATION_JSON));
+
+        assertThat(taskListRepository.findById(taskListId)).isEmpty();
+
+    }
+
+    @Test
+    void testDeleteTestNotFound() throws Exception {
+        UUID randomUUID = UUID.randomUUID();
+        mockMvc.perform(delete(TASK_LIST_PATH_ID, randomUUID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertThat(responseBody).contains(randomUUID + " does not exist!");
+                });
+
 
     }
 }
