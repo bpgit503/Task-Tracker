@@ -70,6 +70,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Optional<Task> getTask(UUID taskListId, UUID taskId) {
+        if(!taskRepository.existsByTaskListIdAndId(taskListId, taskId)) {
+            throw new IllegalArgumentException("Invalid Task List ID or Task ID provided!");
+        }
         return taskRepository.findByTaskListIdAndId(taskListId, taskId);
     }
 
