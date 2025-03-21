@@ -9,7 +9,6 @@ import com.devbp.tasks.repositories.TaskRepository;
 import com.devbp.tasks.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Optional<Task> getTask(UUID taskListId, UUID taskId) {
-        if(!taskRepository.existsByTaskListIdAndId(taskListId, taskId)) {
+        if (!taskRepository.existsByTaskListIdAndId(taskListId, taskId)) {
             throw new IllegalArgumentException("Invalid Task List ID or Task ID provided!");
         }
         return taskRepository.findByTaskListIdAndId(taskListId, taskId);
@@ -96,18 +95,22 @@ public class TaskServiceImpl implements TaskService {
             throw new IllegalArgumentException("Task must have a valid status");
         }
 
-        Task exsitingTask = taskRepository.findByTaskListIdAndId(taskListId, taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        return taskRepository.findByTaskListIdAndId(taskListId, taskId)
+                .map(exsitingTask -> {
+                            exsitingTask.setTitle(task.getTitle());
+                            exsitingTask.setDescription(task.getDescription());
+                            exsitingTask.setDueDate(task.getDueDate());
+                            exsitingTask.setPriority(task.getPriority());
+                            exsitingTask.setStatus(task.getStatus());
+                            exsitingTask.setUpdatedAt(LocalDateTime.now());
+                            return taskRepository.save(exsitingTask);
+                        }
+
+                )
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Task List ID or Task ID provided!"));
 
 
-        exsitingTask.setTitle(task.getTitle());
-        exsitingTask.setDescription(task.getDescription());
-        exsitingTask.setDueDate(task.getDueDate());
-        exsitingTask.setPriority(task.getPriority());
-        exsitingTask.setStatus(task.getStatus());
-        exsitingTask.setUpdatedAt(LocalDateTime.now());
-
-        return taskRepository.save(exsitingTask);
     }
 
     @Transactional

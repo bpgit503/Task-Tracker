@@ -121,7 +121,6 @@ class TaskControllerIT {
     @Test
     void testTaskNotFound() throws Exception {
         UUID taskListId = taskListRepository.findAll().get(0).getId();
-        UUID taskId = taskRepository.findAll().get(0).getId();
 
         mockMvc.perform(get(TASK_PATH_TASK_LIST_ID_TASK_ID, taskListId, UUID.randomUUID())
                         .accept(MediaType.APPLICATION_JSON))
@@ -132,7 +131,65 @@ class TaskControllerIT {
                     assertThat(responseBody).contains("Invalid Task List ID or Task ID provided!");
 
                 });
+    }
 
+    @Test
+    void testUpdateTask() throws Exception {
+        UUID taskListId = taskListRepository.findAll().get(0).getId();
+        UUID taskId = taskRepository.findAll().get(0).getId();
+
+        TaskDto updatedTask = new TaskDto(
+                taskId,
+                "updated Task Title",
+                "updated Task Description",
+                LocalDateTime.of(2025, 3, 27, 0, 0, 0),
+                TaskPriority.HIGH,
+                TaskStatus.OPEN
+        );
+
+        mockMvc.perform(put(TASK_PATH_TASK_LIST_ID_TASK_ID, taskListId, taskId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedTask)))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String response = result.getResponse().getContentAsString();
+                    assertThat(response).isNotEmpty();
+                    assertThat(response).contains(updatedTask.id().toString());
+                    assertThat(response).contains(updatedTask.title());
+                    assertThat(response).contains(updatedTask.description());
+                });
+
+        Optional<Task> retrievedTask = taskRepository.findByTaskListIdAndId(taskListId, taskId);
+
+        assertThat(retrievedTask).isPresent();
+        assertThat(retrievedTask.get().getTitle()).isEqualTo(updatedTask.title());
+        assertThat(retrievedTask.get().getDescription()).isEqualTo(updatedTask.description());
+
+
+    }
+
+    @Test
+    void testUpdateNotFound() throws Exception {
+        UUID taskListId = taskListRepository.findAll().get(0).getId();
+        UUID randomUUID = UUID.randomUUID();
+        TaskDto updatedTask = new TaskDto(
+                randomUUID,
+                "updated Task Title",
+                "updated Task Description",
+                LocalDateTime.of(2025, 3, 27, 0, 0, 0),
+                TaskPriority.HIGH,
+                TaskStatus.OPEN
+        );
+        mockMvc.perform(put(TASK_PATH_TASK_LIST_ID_TASK_ID, taskListId, randomUUID)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedTask)))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertThat(responseBody).contains("Invalid Task List ID or Task ID provided!");
+                });
 
     }
 }
