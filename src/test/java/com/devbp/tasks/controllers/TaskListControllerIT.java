@@ -174,7 +174,7 @@ class TaskListControllerIT {
     }
 
     @Test
-    void testDeleteTest() throws Exception {
+    void testDeleteTaskList() throws Exception {
         UUID taskListId = taskListRepository.findAll().get(1).getId();
 
         mockMvc.perform(delete(TASK_LIST_PATH_ID, taskListId)

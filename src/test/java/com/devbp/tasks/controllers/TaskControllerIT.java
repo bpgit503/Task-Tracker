@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static com.devbp.tasks.controllers.TaskController.TASK_PATH_ID;
 import static com.devbp.tasks.controllers.TaskController.TASK_PATH_TASK_LIST_ID_TASK_ID;
+import static com.devbp.tasks.controllers.TaskListController.TASK_LIST_PATH_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -190,6 +191,32 @@ class TaskControllerIT {
                     String responseBody = result.getResponse().getContentAsString();
                     assertThat(responseBody).contains("Invalid Task List ID or Task ID provided!");
                 });
+
+    }
+
+    @Test
+    void testDeleteTask() throws Exception {
+        UUID taskListId = taskRepository.findAll().get(1).getId();
+        UUID taskId = taskRepository.findAll().get(1).getId();
+
+        mockMvc.perform(delete(TASK_PATH_TASK_LIST_ID_TASK_ID, taskListId, taskId )
+                .accept(MediaType.APPLICATION_JSON));
+
+        assertThat(taskListRepository.findById(taskListId)).isEmpty();
+
+    }
+
+    @Test
+    void testDeleteTestNotFound() throws Exception {
+        UUID randomUUID = UUID.randomUUID();
+        mockMvc.perform(delete(TASK_LIST_PATH_ID, randomUUID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertThat(responseBody).contains(randomUUID + " does not exist!");
+                });
+
 
     }
 }
